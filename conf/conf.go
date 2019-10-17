@@ -121,7 +121,7 @@ func GetHostname() string {
 }
 
 func FormatDpsDomain(subdomain string) string {
-	return fmt.Sprintf("%s.%s", subdomain, GetDpsDomain())
+	return fmt.Sprintf("%s", subdomain)
 }
 
 func GetDpsDomain() string {
