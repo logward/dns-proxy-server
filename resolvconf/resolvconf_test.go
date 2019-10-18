@@ -167,31 +167,6 @@ search acme.com
 }
 
 
-func TestReturnDomainWithDomainSearch(t *testing.T) {
-
-	// arrange
-	const TMP_RESOLV_FILE = "/tmp/test-resolv.conf"
-	os.Setenv(env.MG_RESOLVCONF, TMP_RESOLV_FILE)
-
-	originalFileContent := `
-# Provided by test\n
-# nameserver 8.8.8.8
-nameserver 9.9.9.9
-search acme.com
-`
-	err := ioutil.WriteFile(TMP_RESOLV_FILE, []byte(originalFileContent), 0666)
-	if err != nil {
-		t.Error(err)
-	}
-
-	// act
-	hostname := GetHostname("site1")
-
-	// assert
-	assert.Nil(t, err)
-	assert.Equal(t, "site1.acme.com", hostname)
-}
-
 func TestShouldNotReturnDomainWithDomainSearch(t *testing.T) {
 
 	// arrange

@@ -229,7 +229,7 @@ func GetSearchDomainEntryCached() (string, error){
 
 func GetHostname(subdomain string) string {
 	if domainEntry, err := GetSearchDomainEntryCached(); err == nil && len(domainEntry) !=0 {
-		return fmt.Sprintf("%s.%s", subdomain, domainEntry)
+		return fmt.Sprintf("%s", subdomain)
 	}
 	return subdomain
 }

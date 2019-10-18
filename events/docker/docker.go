@@ -172,7 +172,7 @@ func getHostnamesFromEnv(inspect types.ContainerJSON) ([]string){
 func getContainerHostname(inspect types.ContainerJSON) (string, error) {
 	if len(inspect.Config.Hostname) != 0 {
 		if len(inspect.Config.Domainname) != 0 {
-			return fmt.Sprintf("%s.%s", inspect.Config.Hostname, inspect.Config.Domainname), nil
+			return fmt.Sprintf("%s", inspect.Config.Hostname), nil
 		}else {
 			return inspect.Config.Hostname, nil
 		}
@@ -181,15 +181,16 @@ func getContainerHostname(inspect types.ContainerJSON) (string, error) {
 }
 
 func getHostnameFromContainerName(inspect types.ContainerJSON) string {
-	return fmt.Sprintf("%s.%s", inspect.Name[1:], conf.GetDpsDomain())
+	return fmt.Sprintf("%s", inspect.Name[1:])//conf.GetDpsDomain())
 }
 
 func getHostnameFromServiceName(inspect types.ContainerJSON) (string, error) {
-	const serviceNameLabelKey = "com.docker.compose.service"
+	const serviceNameLabelKey = "com.docker.swarm.service.name"
 	if v, ok := inspect.Config.Labels[serviceNameLabelKey]; ok {
 		logging.Debugf("status=service-found, service=%s", v)
-		return fmt.Sprintf("%s.docker", v), nil
+		return fmt.Sprintf("%s", v), nil
 	}
+
 	return "", errors.New("service not found for container: " + inspect.Name)
 }
 
