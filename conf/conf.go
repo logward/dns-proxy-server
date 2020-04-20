@@ -128,7 +128,7 @@ func GetDpsDomain() string {
 	if domain := os.Getenv(env.MG_DOMAIN); len(strings.TrimSpace(domain)) != 0 {
 		return domain
 	}
-	if conf, _ := getConf(); conf != nil &&  len(conf.HostMachineHostname) != 0 {
+	if conf, _ := getConf(); conf != nil &&  len(conf.Domain) != 0 {
 		return conf.Domain
 	}
 	return *flags.Domain

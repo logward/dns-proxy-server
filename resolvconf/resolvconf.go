@@ -124,12 +124,8 @@ func SetCurrentDnsServerToMachine(ctx context.Context) error {
 
 func GetGatewayIP(ctx context.Context) (string, error) {
 	if dockernetwork.IsDockerConnected() {
-		if ip, err := dockernetwork.FindDpsNetworkGatewayIp(ctx); err == nil {
-			logging.Debugf("status=gateway-ip, ip=%s", ip)
-			return ip, nil
-		}
+		return dockernetwork.GetGatewayIp(ctx)
 	}
-	logging.Debugf("status=machine-ip")
 	return GetCurrentIpAddress()
 }
 
@@ -196,13 +192,14 @@ const(
 )
 
 func GetCurrentIpAddress() (string, error) {
-
+	logging.Debugf("status=get-current-machine-ip")
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return "", err
 	}
 	for _, addr := range addrs {
 		ip := addr.String()
+		logging.Debugf("status=interface-ip, ip=%s", ip)
 		if strings.Contains(ip, "/") {
 			if !strings.HasPrefix(ip, "127") {
 				return ip[:strings.Index(ip, "/")], nil

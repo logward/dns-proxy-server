@@ -1,3 +1,29 @@
+### 2.19.0
+* Support for absolute paths on config files (#188)
+
+### 2.18.7
+* Fixing docker image on latest version wasn't being updated
+
+### 2.18.6
+* Fixing gateway IP resolution when not in DPS network (#186)
+
+### 2.18.5
+* Fixing unnecessary stacktraces were being logged
+* Answering NXDOMAIN when no answers were found
+* Fixing logging file trace
+
+### 2.18.4
+* Bumping github-cli to fix releasing
+
+### 2.18.3
+* Resolving docker services using configured DPS domain
+* Fix presence check of config setting "domain"
+* Adding working around coordinates for resolv.conf at the docs
+* Fixing releasing
+
+### 2.18.2
+* Fixing wrong mapping on `logLevel` property
+
 ### 2.18.1
 * Change log level before try to log something
 

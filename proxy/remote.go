@@ -29,7 +29,7 @@ func (r remoteDnsSolver) Solve(ctx context.Context, question dns.Question) (*dns
 	m.SetQuestion(dns.Fqdn(question.Name), question.Qtype) // CAN BE A, AAA, MX, etc.
 	m.RecursionDesired = true
 
-	logging.Debugf("solver=remote, name=%s, qtype=%d", ctx, question.Name, question.Qtype)
+	logging.Debugf("solver=remote, status=solving, name=%s, qtype=%d", ctx, question.Name, question.Qtype)
 	var config *localvo.Configuration
 	var err error
 	if !c.ContainsKey(SERVERS) {
@@ -54,13 +54,13 @@ func (r remoteDnsSolver) Solve(ctx context.Context, question dns.Question) (*dns
 			continue
 		} else if res.Rcode != dns.RcodeSuccess { // what the code of the return message ?
 			err = errors.New(fmt.Sprintf("status=invalid-answer-name, name=%s, rcode=%d", question.Name, res.Rcode))
-			logging.Infof("status=bad-code, name=%s, rcode=%d, err=%s", ctx, question.Name, res.Rcode, err)
+			logging.Infof("status=bad-code, name=%s, rcode=%d, err=%s", ctx, question.Name, res.Rcode, err.Error())
 			continue
 		}
 		logging.Debugf("status=remote-solved, server=%s, name=%s, res=%d, answers=%d", ctx, server.Ip, question.Name, getRCode(res), len(res.Answer))
 		return res, nil
 	}
-	logging.Infof("status=complete, name=%s, res=%d, err=%s", ctx, question.Name, getRCode(res), err)
+	logging.Infof("status=complete, name=%s, res=%d", ctx, question.Name, getRCode(res))
 	return res, err
 }
 
