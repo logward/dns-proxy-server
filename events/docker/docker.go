@@ -181,6 +181,9 @@ func getContainerHostname(inspect types.ContainerJSON) (string, error) {
 }
 
 func getHostnameFromContainerName(inspect types.ContainerJSON) string {
+	if hostnameFromServiceName, err := getHostnameFromServiceName(inspect); err == nil {
+		return hostnameFromServiceName
+	}
 	return fmt.Sprintf("%s", inspect.Name[1:])//conf.GetDpsDomain())
 }
 
