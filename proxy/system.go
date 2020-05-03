@@ -4,13 +4,10 @@ import (
 	"errors"
 	"github.com/mageddo/dns-proxy-server/conf"
 	"github.com/mageddo/dns-proxy-server/resolvconf"
-	"github.com/mageddo/dns-proxy-server/utils"
-	"github.com/mageddo/go-logging"
 	"github.com/miekg/dns"
 	"golang.org/x/net/context"
 	"net"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -25,16 +22,6 @@ func (s SystemDnsSolver) Solve(ctx context.Context, question dns.Question) (*dns
 		return s.getMsg(questionName, ip, question), err
 	}
 	return nil, errors.New("host not found")
-}
-
-func getLocalMachineIp(ctx context.Context, questionName string) (string, error) {
-	ip, err, code := utils.Exec("sh", "-c", "ip r | awk '/default/{print $3}'")
-	if code == 0 {
-		clearedIP := regexp.MustCompile(`\s`).ReplaceAllLiteralString(string(ip), ``)
-		logging.Infof("status=solved, solver=system, question=%s, ip=%s", ctx, questionName, clearedIP)
-		return clearedIP, nil
-	}
-	return "", err
 }
 
 func (s SystemDnsSolver) Name() string {

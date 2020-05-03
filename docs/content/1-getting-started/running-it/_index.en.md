@@ -5,13 +5,26 @@ weight: 1
 
 ### Running on Linux
 
-#### On docker
+#### On Docker
 
 ```bash
 $ docker run --rm --hostname dns.mageddo --name dns-proxy-server -p 5380:5380 \
   -v /opt/dns-proxy-server/conf:/app/conf \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /etc/resolv.conf:/etc/resolv.conf \
+  defreitas/dns-proxy-server
+```
+
+If your system is periodically recreating `/etc/resolv.conf` (like `dhclient` does) and DPS stops working
+after a while you may need to try the following variant instead (see
+[issue 166](https://github.com/mageddo/dns-proxy-server/issues/166) for why this is):
+
+```bash
+$ docker run --rm --hostname dns.mageddo --name dns-proxy-server -p 5380:5380 \
+  -v /opt/dns-proxy-server/conf:/app/conf \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /etc:/host/etc \
+  -e MG_RESOLVCONF=/host/etc/resolv.conf \
   defreitas/dns-proxy-server
 ```
 

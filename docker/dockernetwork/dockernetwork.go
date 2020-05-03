@@ -57,11 +57,44 @@ func CreateOrUpdateDpsNetwork(ctx context.Context) (types.NetworkCreateResponse,
 	return res, err
 }
 
+func GetGatewayIp(ctx context.Context) (string, error) {
+	if ip, err := FindDpsNetworkGatewayIp(ctx); err == nil {
+		logging.Debugf("status=FindDpsNetworkGatewayIp, ip=%s", ip)
+		return ip, nil
+	}
+	if ip, err := FindDockerNetworkNetworkGatewayIp(ctx); err == nil {
+		logging.Debugf("status=FindDockerNetworkNetworkGatewayIp, ip=%s", ip)
+		return ip, nil
+	} else {
+		return "", err
+	}
+}
 func FindNetworkGatewayIp(ctx context.Context, name string) (string, error) {
+	logging.Debugf("status=begin, network=%s", name)
 	if networkResource, err := FindNetworkByName(ctx, name); err != nil {
 		return "", err
-	} else  {
-		return networkResource.IPAM.Config[0].Gateway, nil
+	} else {
+		return GetNetworkGatewayIp(networkResource), nil
+	}
+}
+
+func GetNetworkGatewayIp(n *types.NetworkResource) string {
+	return n.IPAM.Config[0].Gateway
+}
+
+func FindDockerNetworkNetworkGatewayIp(ctx context.Context)(string, error){
+	if ip, err := FindNetworkGatewayIp(ctx, "bridge"); err == nil {
+		return ip, nil
+	}
+	if networks, err := ListNetworks(ctx); err == nil {
+		if len(networks) == 0 {
+			return "", errors.New("No network found on this docker daemon")
+		}
+		n := &networks[0]
+		logging.Debugf("status=from-first-docker-network, network=%s", n.Name)
+		return GetNetworkGatewayIp(n), nil
+	} else {
+		return "", err
 	}
 }
 
@@ -81,9 +114,16 @@ func FindNetworkByID(ctx context.Context, id string) (*types.NetworkResource, er
 	return FindNetwork(ctx, fmt.Sprintf("id=^%s", id))
 }
 
+func ListNetworks(ctx context.Context, args ... string) ([]types.NetworkResource, error) {
+	if networks, err := cli.NetworkList(ctx, types.NetworkListOptions{Filters: MustParseFlags(args...)}); err != nil {
+		return nil, errors.WithMessage(err, "can't list networks")
+	} else {
+		return networks, nil
+	}
+}
+
 func FindNetwork(ctx context.Context, args ... string) (*types.NetworkResource, error) {
-	networks, err := cli.NetworkList(ctx, types.NetworkListOptions{Filters: MustParseFlags(args...)})
-	if err != nil {
+	if networks, err := ListNetworks(ctx, args...); err != nil {
 		return nil, errors.WithMessage(err, "can't list networks")
 	} else if len(networks) == 1 {
 		return &networks[0], nil
